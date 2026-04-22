@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>排球人测试</title>
+  <style>
+    :root {
+      --bg: #f6faf6;
+      --panel: #ffffff;
+      --text: #1e2a22;
+      --muted: #6a786f;
+      --line: #dbe8dd;
+      --soft: #edf6ef;
+      --accent: #6c8d71;
+      --accent-strong: #4d6a53;
+      --shadow: 0 16px 40px rgba(47, 73, 55, 0.08);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at top left, #f8fff8 0, #f6faf6 36%, #f2f7f3 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .shell {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 16px 56px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 28px;
+      margin-top: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(127, 165, 134, 0.18), rgba(127, 165, 134, 0.02));
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--accent-strong);
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 999px;
+      padding: 8px 12px;
+      margin-bottom: 16px;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 52px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      max-width: 680px;
+    }
+    .hero .sub {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.75;
+      max-width: 720px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 0.9fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-top: 24px;
+    }
+
+    .mini-panel {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #fbfefb, #f3f8f4);
+    }
+
+    .mini-panel h3 {
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    .mini-panel ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+        .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 22px;
+    }
+    .hero-minimal {
+      min-height: 48vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 42px 20px;
+    }
+    .hero-minimal::after { display: none; }
+    .hero-minimal h1 {
+      max-width: none;
+      margin: 0;
+    }
+    .hero-actions-single {
+      justify-content: center;
+      margin-top: 28px;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      transition: transform .16s ease, box-shadow .16s ease, opacity .16s ease;
+      font: inherit;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { cursor: not-allowed; opacity: 0.55; transform: none; }
+
+    .btn-primary {
+      background: var(--accent-strong);
+      color: #fff;
+      padding: 14px 20px;
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(77, 106, 83, 0.18);
+      font-weight: 700;
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--accent-strong);
+      padding: 14px 20px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      font-weight: 700;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .test-wrap,
+    .result-wrap {
+      margin-top: 22px;
+      padding: 22px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .progress {
+      flex: 1;
+      min-width: 240px;
+      height: 10px;
+      background: #edf3ee;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress > span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #97b59c, #5b7a62);
+      border-radius: inherit;
+      transition: width .22s ease;
+    }
+
+    .progress-text {
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .question-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .question {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff, #fbfdfb);
+    }
+
+    .question-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+    }
+
+    .question-title {
+      font-size: 16px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      transition: border-color .16s ease, background .16s ease, transform .16s ease;
+    }
+
+    .option:hover {
+      border-color: #bcd0c1;
+      background: #f8fcf9;
+    }
+
+    .option input {
+      margin-top: 3px;
+      accent-color: var(--accent-strong);
+      transform: scale(1.1);
+      flex-shrink: 0;
+    }
+
+    .option-code {
+      font-weight: 800;
+      color: var(--accent-strong);
+      min-width: 22px;
+    }
+
+    .actions-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      padding-top: 6px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .result-hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .type-box,
+    .score-box,
+    .dim-box,
+    .top3-box,
+    .about-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff, #fbfdfb);
+    }
+
+    .type-kicker {
+      font-size: 12px;
+      color: var(--accent-strong);
+      margin-bottom: 8px;
+      letter-spacing: .05em;
+    }
+
+    .type-name {
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .type-subname {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .match {
+      margin-top: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      color: var(--accent-strong);
+      font-weight: 700;
+    }
+
+    .type-desc {
+      margin-top: 18px;
+      line-height: 1.85;
+      font-size: 15px;
+      color: #304034;
+    }
+
+    .score-box h3,
+    .dim-box h3,
+    .top3-box h3,
+    .about-box h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .score-item {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .score-item .k {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .score-item .v {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent-strong);
+    }
+
+    .dim-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .dim-pill {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .dim-pill .label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .dim-pill .value {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent-strong);
+    }
+
+    .top3-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .top3-item {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .top3-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .top3-item span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .top3-score {
+      color: var(--accent-strong);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .about-box p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    
+    .result-layout {
+      display: grid;
+      gap: 18px;
+    }
+    .result-top {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+    .poster-box, .type-box, .analysis-box, .dim-box, .note-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff, #fbfdfb);
+    }
+        .poster-box {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      min-height: 280px;
+      overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(circle at top right, rgba(127,165,134,0.16), rgba(127,165,134,0) 40%),
+        linear-gradient(180deg, #ffffff, #f7fbf8);
+    }
+    .poster-box::after {
+      content: "";
+      position: absolute;
+      right: -46px;
+      bottom: -46px;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(127,165,134,0.12), rgba(127,165,134,0.01));
+      pointer-events: none;
+    }
+    .poster-image {
+      width: 100%;
+      min-height: 220px;
+      max-height: 460px;
+      object-fit: contain;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.75);
+      position: relative;
+      z-index: 1;
+    }
+    .poster-box.no-image .poster-image {
+      display: none;
+    }
+    .poster-caption {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+      position: relative;
+      z-index: 1;
+    }
+    .type-kicker {
+      font-size: 12px;
+      color: var(--accent-strong);
+      margin-bottom: 8px;
+      letter-spacing: .06em;
+    }
+    .type-name {
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+    .type-subname {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .match {
+      margin-top: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      color: var(--accent-strong);
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .analysis-box h3, .dim-box h3, .note-box h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+    .result-actions {
+      margin-top: 22px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .analysis-box p {
+      margin: 0;
+      color: #304034;
+      font-size: 15px;
+      line-height: 1.9;
+      white-space: pre-wrap;
+    }
+    .dim-list {
+      display: grid;
+      gap: 12px;
+    }
+    .dim-item {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fff;
+    }
+    .dim-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .dim-item-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .dim-item-score {
+      color: var(--accent-strong);
+      font-weight: 800;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .dim-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .note-box p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .author-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, #ffffff, #fbfdfb);
+      overflow: hidden;
+    }
+    .author-box summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .author-box summary::-webkit-details-marker { display: none; }
+    .author-box summary::after {
+      content: '展开';
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-strong);
+      border: 1px solid var(--line);
+      background: var(--soft);
+      padding: 6px 10px;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+    .author-box[open] summary::after {
+      content: '收起';
+    }
+    .author-content {
+      border-top: 1px solid var(--line);
+      padding: 0 18px 18px;
+    }
+    .author-content p {
+      margin: 14px 0 0;
+      color: #304034;
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .result-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+    }
+    @media (max-width: 860px) {
+      .result-top { grid-template-columns: 1fr; }
+    }
+
+@media (max-width: 860px) {
+      .hero-grid,
+      .result-hero {
+        grid-template-columns: 1fr;
+      }
+      .dim-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 600px) {
+      .shell { padding: 14px 12px 42px; }
+      .hero, .test-wrap, .result-wrap { padding: 16px; }
+      .hero h1 { font-size: 32px; }
+      .question-title { font-size: 15px; }
+      .dim-grid,
+      .score-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section id="intro" class="screen active">
+      <div class="hero card hero-minimal">
+        <h1>这不是技术统计，是排球人设审判。</h1>
+        <p class="sub">15 个维度，30 道题，10 种抽象画像。它不会告诉你能不能进省队，只会告诉你平时到底在场上扮演哪种麻烦。</p>
+        <div class="hero-actions hero-actions-single">
+          <button id="startBtn" class="btn-primary">开始测试</button>
+        </div>
+        <div style="padding-top: 2rem; display: flex; flex-direction: column;">
+          <span>
+            原模板：
+            <a href="https://space.bilibili.com/417038183">B站@蛆肉儿串儿</a>
+          </span>
+          <span>
+            当前版本：排球人 15 维测试
+          </span>
+          <span>
+            风格：抽象一点，毒舌一点，但先声明还是娱乐向
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section id="test" class="screen">
+      <div class="test-wrap card">
+        <div class="topbar">
+          <div class="progress"><span id="progressBar"></span></div>
+          <div class="progress-text" id="progressText">0 / 24</div>
+        </div>
+
+        <div id="questionList" class="question-list"></div>
+
+        <div class="actions-bottom">
+          <div class="hint" id="testHint">全选完才会放行。世界已经够乱了，起码把题做完整。</div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button id="backIntroBtn" class="btn-secondary">返回首页</button>
+            <button id="submitBtn" class="btn-primary" disabled>提交并查看结果</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    
+    <section id="result" class="screen">
+      <div class="result-wrap card">
+        <div class="result-layout">
+          <div class="result-top">
+            <div class="poster-box" id="posterBox">
+              <img id="posterImage" class="poster-image" alt="测试结果图" />
+              <div id="posterCaption" class="poster-caption">准备好看看自己平时到底在球场上怎么碍事了吗？</div>
+            </div>
+
+            <div class="type-box">
+              <div class="type-kicker" id="resultModeKicker">你的主类型</div>
+              <div class="type-name" id="resultTypeName">GLUE（胶核）</div>
+              <div class="match" id="matchBadge">匹配度 92%</div>
+              <div class="type-subname" id="resultTypeSub">系统备注会显示在这里。</div>
+            </div>
+          </div>
+
+          <div class="analysis-box">
+            <h3>这类排球人的简单解读</h3>
+            <p id="resultDesc"></p>
+          </div>
+
+          <div class="dim-box">
+            <h3>十五维度评分</h3>
+            <div id="dimList" class="dim-list"></div>
+          </div>
+
+          <div class="note-box">
+            <h3>友情提示</h3>
+            <p id="funNote">本测试仅供娱乐，别拿它当选拔、淘汰、封神、退役建议或人生判决书。</p>
+          </div>
+
+                    <details class="author-box">
+            <summary>说明</summary>
+            <div class="author-content">
+              <p>这个版本基于原始 SBTI 页面结构改造，保留了模板形式，但内容已经替换成排球场景。</p>
+              <p>维度、题目和画像都围绕业余排球常见生态生成，重点是把人损明白，不是把人测明白。</p>
+              <p>如果你测完觉得被点名了，说明这套东西多少还是抓到了点习惯；如果觉得完全不准，也正常，毕竟球场上的人本来就很会装。</p>
+              <p>总之娱乐第一，别拿它替代训练、录像复盘、教练意见和真正的自我反省。</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="result-actions">
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button id="restartBtn" class="btn-secondary">重新测试</button>
+            <button id="toTopBtn" class="btn-primary">回到首页</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  
+  <script>
+    const dimensionMeta = {
+  "S1": {
+    "name": "S1 团队协作意识",
+    "model": "团队属性"
+  },
+  "S2": {
+    "name": "S2 场上沟通能力",
+    "model": "团队属性"
+  },
+  "S3": {
+    "name": "S3 进攻欲望",
+    "model": "比赛风格"
+  },
+  "S4": {
+    "name": "S4 防守专注度",
+    "model": "比赛风格"
+  },
+  "S5": {
+    "name": "S5 心理稳定性",
+    "model": "心理素质"
+  },
+  "S6": {
+    "name": "S6 应变能力",
+    "model": "心理素质"
+  },
+  "S7": {
+    "name": "S7 领导能力",
+    "model": "领导特质"
+  },
+  "S8": {
+    "name": "S8 服从指挥度",
+    "model": "领导特质"
+  },
+  "S9": {
+    "name": "S9 竞争心态",
+    "model": "竞技态度"
+  },
+  "S10": {
+    "name": "S10 训练投入度",
+    "model": "竞技态度"
+  },
+  "S11": {
+    "name": "S11 身体对抗偏好",
+    "model": "身体属性"
+  },
+  "S12": {
+    "name": "S12 身高体型认知",
+    "model": "身体属性"
+  },
+  "S13": {
+    "name": "S13 位置适应度",
+    "model": "技术特点"
+  },
+  "S14": {
+    "name": "S14 战术理解力",
+    "model": "技术特点"
+  },
+  "S15": {
+    "name": "S15 比赛经验",
+    "model": "经验值"
+  }
+};
+    const questions = [
+  {
+    "id": "q1",
+    "dim": "S1",
+    "text": "队友一传连续飞天（飞两次还要飞第三次）时，你会先补位救球，而不是原地开喷。",
+    "options": [
+      {
+        "label": "先稳住队，再聊对错",
+        "value": 3
+      },
+      {
+        "label": "看关系，偶尔会帮",
+        "value": 2
+      },
+      {
+        "label": "我也会顺便补两句",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q2",
+    "dim": "S1",
+    "text": "训练结束后的聚餐、约球群、日常聊天里有人总被落下时，你会主动把他拉进来。",
+    "options": [
+      {
+        "label": "会，我会主动带他进圈",
+        "value": 3
+      },
+      {
+        "label": "看情况，偶尔会拉一下",
+        "value": 2
+      },
+      {
+        "label": "我不管场下社交这摊事",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q3",
+    "dim": "S2",
+    "text": "有人一丢分就甩脸子、拒绝交流时，你会继续报点和提醒。",
+    "options": [
+      {
+        "label": "我会继续报点和提醒",
+        "value": 3
+      },
+      {
+        "label": "关键分会喊，平时看心情",
+        "value": 2
+      },
+      {
+        "label": "气氛烂了我就闭麦",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q4",
+    "dim": "S2",
+    "text": "约球群消息爆炸、语音乱飞时，你还能把关键安排听明白，不会全程失联。",
+    "options": [
+      {
+        "label": "我能过滤并执行重点",
+        "value": 3
+      },
+      {
+        "label": "一半有用一半随缘",
+        "value": 2
+      },
+      {
+        "label": "我会被带乱节奏",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q5",
+    "dim": "S3",
+    "text": "二传连续不给你传球时，你不会摆烂，机会来了照样敢下手。",
+    "options": [
+      {
+        "label": "有机会就狠狠干",
+        "value": 3
+      },
+      {
+        "label": "看手感，偶尔保守",
+        "value": 2
+      },
+      {
+        "label": "不给我传我就不打",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q6",
+    "dim": "S3",
+    "text": "队友开始装逼乱秀、把简单球打成花活时，你还能坚持按“先拿分”的思路处理球。",
+    "options": [
+      {
+        "label": "我会优先拿分",
+        "value": 3
+      },
+      {
+        "label": "有时会忍不住秀一下",
+        "value": 2
+      },
+      {
+        "label": "能秀就秀，成败随缘",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q7",
+    "dim": "S4",
+    "text": "被对面追发、再加队友情绪上脸时，你还能把注意力放在下一板。",
+    "options": [
+      {
+        "label": "先把球救活再说",
+        "value": 3
+      },
+      {
+        "label": "会波动，但能拉回",
+        "value": 2
+      },
+      {
+        "label": "容易当场心态爆线",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q8",
+    "dim": "S4",
+    "text": "队友在场上忙着“谈恋爱互动”漏了防守点，你会先补位把球救起来。",
+    "options": [
+      {
+        "label": "我会补位兜底",
+        "value": 3
+      },
+      {
+        "label": "能补一点，但不稳定",
+        "value": 2
+      },
+      {
+        "label": "谁漏谁自己背锅",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q9",
+    "dim": "S5",
+    "text": "比分落后、判罚争议、队友甩脸子同时出现时，你还能正常处理球。",
+    "options": [
+      {
+        "label": "能，先做该做的",
+        "value": 3
+      },
+      {
+        "label": "会烦，但还能打",
+        "value": 2
+      },
+      {
+        "label": "我会先爆再说",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q10",
+    "dim": "S5",
+    "text": "赛后在群里被点名失误时，你更常先复盘和修正，而不是直接阴阳怪气。",
+    "options": [
+      {
+        "label": "先改动作和节奏",
+        "value": 3
+      },
+      {
+        "label": "会不爽，但能调整",
+        "value": 2
+      },
+      {
+        "label": "我会直接情绪上头",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q11",
+    "dim": "S6",
+    "text": "连续拿到“没法打的二传球”时，你能快速换处理方式，不会连续硬送。",
+    "options": [
+      {
+        "label": "会立刻切换处理方案",
+        "value": 3
+      },
+      {
+        "label": "需要几球适应",
+        "value": 2
+      },
+      {
+        "label": "我容易直接卡死",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q12",
+    "dim": "S6",
+    "text": "临场换人换位换战术时，你能边沟通边落地执行，不当场掉线。",
+    "options": [
+      {
+        "label": "能，变化越多越冷静",
+        "value": 3
+      },
+      {
+        "label": "能跟上大部分变化",
+        "value": 2
+      },
+      {
+        "label": "一变动我就手忙脚乱",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q13",
+    "dim": "S7",
+    "text": "比赛前群聊吵起来、线下气氛变僵时，你会主动把分工和节奏重新理顺。",
+    "options": [
+      {
+        "label": "会，我来收束全队",
+        "value": 3
+      },
+      {
+        "label": "必要时会开口",
+        "value": 2
+      },
+      {
+        "label": "我一般选择沉默",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q14",
+    "dim": "S7",
+    "text": "有人被小团体冷处理时，你会主动把他拉回轮转和配合。",
+    "options": [
+      {
+        "label": "会，先把人拉回场上",
+        "value": 3
+      },
+      {
+        "label": "看人，看局面",
+        "value": 2
+      },
+      {
+        "label": "我不想掺和这种事",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q15",
+    "dim": "S8",
+    "text": "对场下安排（集合时间、AA、轮值）有意见时，你也会先配合执行再沟通。",
+    "options": [
+      {
+        "label": "先执行，赛后再聊",
+        "value": 3
+      },
+      {
+        "label": "大体执行，偶尔自改",
+        "value": 2
+      },
+      {
+        "label": "我会按自己想法打",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q16",
+    "dim": "S9",
+    "text": "对面挑衅、队友嘴炮升级时，你会把火气转成下一分。",
+    "options": [
+      {
+        "label": "直接用球回击",
+        "value": 3
+      },
+      {
+        "label": "偶尔会被带节奏",
+        "value": 2
+      },
+      {
+        "label": "先吵赢再说",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q17",
+    "dim": "S9",
+    "text": "不在正式比赛日，约球和训练局你也会认真对待，不玩“到场打卡式”参与。",
+    "options": [
+      {
+        "label": "上场就想赢",
+        "value": 3
+      },
+      {
+        "label": "看对手强度决定",
+        "value": 2
+      },
+      {
+        "label": "输赢无所谓，玩玩而已",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q18",
+    "dim": "S10",
+    "text": "没人盯进度时，你也会按时赴约训练，不会临时放鸽子影响整队计划。",
+    "options": [
+      {
+        "label": "能长期练基础",
+        "value": 3
+      },
+      {
+        "label": "能练，但要看状态",
+        "value": 2
+      },
+      {
+        "label": "我更爱打不爱练",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q19",
+    "dim": "S10",
+    "text": "赛后复盘在群里展开时，你会看问题和建议，不只转发表情包和高光片段。",
+    "options": [
+      {
+        "label": "会，先找问题再修",
+        "value": 3
+      },
+      {
+        "label": "会看，但不系统",
+        "value": 2
+      },
+      {
+        "label": "我只想看帅球",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q20",
+    "dim": "S11",
+    "text": "网前卡位和身体对抗时，你不会下意识后退把位置白送。",
+    "options": [
+      {
+        "label": "该顶就顶住",
+        "value": 3
+      },
+      {
+        "label": "能顶，但不太持久",
+        "value": 2
+      },
+      {
+        "label": "我会本能让位",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q21",
+    "dim": "S12",
+    "text": "你清楚自己的身体条件，不会硬学不适配打法把自己打崩。",
+    "options": [
+      {
+        "label": "我会按条件选打法",
+        "value": 3
+      },
+      {
+        "label": "大体清楚，偶尔上头",
+        "value": 2
+      },
+      {
+        "label": "主打一个不服硬刚",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q22",
+    "dim": "S13",
+    "text": "被临时安排到不熟位置时，你能较快进入职责状态。",
+    "options": [
+      {
+        "label": "能，先把职责打满",
+        "value": 3
+      },
+      {
+        "label": "能打，但会有延迟",
+        "value": 2
+      },
+      {
+        "label": "换位后基本掉线",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q23",
+    "dim": "S14",
+    "text": "战术内容发在群文件或白板图时，你会认真看并带到下一次实战里。",
+    "options": [
+      {
+        "label": "战术优先，机会再秀",
+        "value": 3
+      },
+      {
+        "label": "大方向懂，细节随缘",
+        "value": 2
+      },
+      {
+        "label": "我更信直觉乱战",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "q24",
+    "dim": "S15",
+    "text": "我发誓，我没有和球队里的异性或同性搞过暧昧、谈过恋爱。",
+    "options": [
+      {
+        "label": "确实，球队不是恋综",
+        "value": 3
+      },
+      {
+        "label": "基本是，但边界偶尔拉扯",
+        "value": 2
+      },
+      {
+        "label": "这题是在点我",
+        "value": 1
+      }
+    ]
+  }
+];
+    const specialQuestions = [];
+
+    const TYPE_LIBRARY = {
+  "GLUE": {
+    "code": "GLUE",
+    "cn": "队魂补锅王",
+    "intro": "你平时不吭声，一乱就得你来兜。",
+    "desc": "你是那种存在感低但离了就崩的人。谁一传飞了你补，谁上头了你拉，谁失误了你还得顺带做情绪售后。名场面不一定有你，但烂场面百分百有你。说白了，你不是来刷高光的，你是来防止全队上热搜翻车的。"
+  },
+  "KNIFE": {
+    "code": "KNIFE",
+    "cn": "装逼犯",
+    "intro": "你打球讲究一个帅，至于稳不稳另说。",
+    "desc": "你不是不会打，你是太爱秀。能一板拍死的球你偏要来个花活，能稳稳拿分你偏要整点高难动作。顺的时候全场“卧槽”，翻车的时候队友集体扶额。你的问题从来不是能力，是你总想把每一球都打成自己的个人集锦。"
+  },
+  "WALL": {
+    "code": "WALL",
+    "cn": "定海神针",
+    "intro": "你不一定最亮眼，但你在队伍就不容易沉。",
+    "desc": "你是队里那根定海神针，节奏乱了你兜，心态崩了你顶，比分咬住时你最像人。你不靠嘴炮，不靠情绪，靠的是稳定输出和关键分硬扛。缺点是你有时过于保守，像老干部系统，稳到稳，但偶尔也会错过该冲的窗口。"
+  },
+  "SPARK": {
+    "code": "SPARK",
+    "cn": "甩脸哥",
+    "intro": "球可以丢，表情不能输。",
+    "desc": "你是情绪上脸速度比球速还快的代表人物。队友失误你脸一沉，二传没喂好你直接冷场，自己失误还会先和空气吵两句。状态好时你很猛，状态差时你会把全队气氛拉进冰点。你最大的问题不是技术，是情绪管理常年放养。"
+  },
+  "ANCHOR": {
+    "code": "ANCHOR",
+    "cn": "球痴",
+    "intro": "你脑子里基本只有排球，别的都能延后。",
+    "desc": "你对排球的热爱已经接近执念：别人打完就撤，你还在看动作、复盘线路、研究下一轮怎么打。训练苦你不怕，脏活累活你也认。问题是你偶尔太沉浸在“球”的世界里，对人情世故不敏感，容易被说成直男式沟通。"
+  },
+  "SWITCH": {
+    "code": "SWITCH",
+    "cn": "球场麦霸",
+    "intro": "你不开口还好，一开口就是全场立体声。",
+    "desc": "你在场上的存在感主要靠嘴：提醒、指挥、吐槽、复盘一条龙，安静两秒都算你状态不好。优点是信息量足，队伍不容易断线；缺点是你说太多时容易变噪音，甚至把队友直接说烦。建议保留音量，提升含金量。"
+  },
+  "STATIC": {
+    "code": "STATIC",
+    "cn": "排球卧底",
+    "intro": "你偶尔打出一种“对面第七人”的美感。",
+    "desc": "你不是故意坑队友，但你总能在关键时刻贡献离谱失误：不是一传送礼，就是防守漏球，再不然就关键分发球自爆。你也想打好，可你的稳定性像失联信号。毒一点说，你不是不会打，你只是经常在最不能掉链子的时候掉链子。"
+  },
+  "ECHO": {
+    "code": "ECHO",
+    "cn": "球队润滑剂",
+    "intro": "你不抢镜，但没你这队会卡顿。",
+    "desc": "你是队里最会“把事情接住”的那种人：谁情绪炸了你缓，谁节奏断了你补，谁被孤立了你能把人重新拉进配合。你不一定刷数据，但你能让队伍少很多内耗。缺点是你太习惯做中间层，偶尔会把自己的进攻欲和存在感压没了。"
+  },
+  "RULER": {
+    "code": "RULER",
+    "cn": "人间战术板",
+    "intro": "你开口就是方案，闭口就是复盘。",
+    "desc": "你属于脑子比情绪先上线的类型。轮次、分工、取舍、风险，你都算得门儿清，队里散装的时候你很容易自动接管秩序。副作用是你有点像“移动标准答案”，对错分得太快，语气一冷就容易让人血压上来。能力没问题，表达得再有人味一点会更无敌。"
+  },
+  "FOAM": {
+    "code": "FOAM",
+    "cn": "交际花",
+    "intro": "你在队里的人脉密度，常常高于你的扣球密度。",
+    "desc": "你社交能力拉满，跟谁都能搭上话，队里气氛靠你盘活一半。你知道谁跟谁闹别扭，也知道怎么把场子聊热。问题是你偶尔把精力全用在关系经营上，比赛专注度会掉线。再直白点：你是优秀的团队气氛组，但别忘了你是来打球的。"
+  }
+};
+    const TYPE_IMAGES = {
+  "GLUE": "./image/GLUE.png",
+  "KNIFE": "./image/KNIFE.png",
+  "WALL": "./image/WALL.png",
+  "SPARK": "./image/SPARK.png",
+  "ANCHOR": "./image/ANCHOR.png",
+  "SWITCH": "./image/SWITCH.png",
+  "STATIC": "./image/STATIC.png",
+  "ECHO": "./image/ECHO.png",
+  "RULER": "./image/RULER.png",
+  "FOAM": "./image/FOAM.png"
+};
+
+    const NORMAL_TYPES = [
+  {
+    "code": "GLUE",
+    "pattern": "HHH-HMH-MLM-MMH-MHM"
+  },
+  {
+    "code": "KNIFE",
+    "pattern": "MMH-HLM-LLH-MHL-LLM"
+  },
+  {
+    "code": "WALL",
+    "pattern": "MML-HHM-MHM-LHH-MMH"
+  },
+  {
+    "code": "SPARK",
+    "pattern": "LMH-LHM-LLH-LMM-MHL"
+  },
+  {
+    "code": "ANCHOR",
+    "pattern": "MMM-MHM-LLM-MHM-MHH"
+  },
+  {
+    "code": "SWITCH",
+    "pattern": "LHL-MHH-HHM-MHM-MLM"
+  },
+  {
+    "code": "STATIC",
+    "pattern": "LLM-LLM-LMM-LHM-LLL"
+  },
+  {
+    "code": "ECHO",
+    "pattern": "HHL-HMH-MHL-MMH-MMM"
+  },
+  {
+    "code": "RULER",
+    "pattern": "MHM-HMH-HHH-HLL-HHH"
+  },
+  {
+    "code": "FOAM",
+    "pattern": "HHM-LLM-MLM-LMH-MLH"
+  }
+];
+    const DIM_EXPLANATIONS = {
+  "S1": {
+    "L": "更像临时拼桌的散客，球一乱就默认各打各的。",
+    "M": "知道团队重要，但急了还是容易先顾自己的戏份。",
+    "H": "有明显的协作脑，不会把六个人的比赛打成个人才艺展示。"
+  },
+  "S2": {
+    "L": "场上沟通主要靠眼神许愿，队友听懂算你们有缘。",
+    "M": "该喊会喊，但混乱一来嗓子和脑子总有一个掉线。",
+    "H": "信息传达清楚直接，知道排球不是默剧。"
+  },
+  "S3": {
+    "L": "机会球到面前也未必敢下手，礼貌得像来旁听比赛。",
+    "M": "有进攻欲，但稳定性取决于当日胆量和手感。",
+    "H": "看见机会就想解决问题，进攻按钮基本长期常亮。"
+  },
+  "S4": {
+    "L": "一转后排就容易进入围观状态，防守靠运气和祖传反射。",
+    "M": "能守，但专注度会随着比分和体力上下漂移。",
+    "H": "防守在线时间长，知道脏活累活才最容易暴露真水平。"
+  },
+  "S5": {
+    "L": "情绪波动比较有存在感，关键分容易先和自己打起来。",
+    "M": "大体稳得住，但遇到连续失误还是会短暂内爆。",
+    "H": "抗压能力不错，不会因为几球失手就现场把心态摔碎。"
+  },
+  "S6": {
+    "L": "计划一变就容易卡壳，临场反应像系统正在重启。",
+    "M": "能调整，但速度一般，得先在脑内骂完一轮。",
+    "H": "适应快、补救快，出事时至少不像站桩等死。"
+  },
+  "S7": {
+    "L": "更适合当执行位，真要带头容易先把自己带丢。",
+    "M": "偶尔能站出来，但领导欲和责任感并不稳定。",
+    "H": "有把队伍重新捏起来的能力，关键时刻敢接指挥权。"
+  },
+  "S8": {
+    "L": "服从度偏低，战术说完你还想现场加点个人发挥。",
+    "M": "大多数时候能跟，但内心仍保留一点不服管。",
+    "H": "理解配合优先级，知道不是每个回合都该轮到你造反。"
+  },
+  "S9": {
+    "L": "胜负欲不算强，输赢有时被你包装成一种淡然。",
+    "M": "想赢，但还没到每球都要把人咬碎的程度。",
+    "H": "竞争意识强，对面一嚣张你就更不想给他好脸色。"
+  },
+  "S10": {
+    "L": "训练热情看心情，进步主要寄希望于玄学顿悟。",
+    "M": "能练，但枯燥一多就开始和灵魂分居。",
+    "H": "投入度高，知道技术不会自己从天花板上掉下来。"
+  },
+  "S11": {
+    "L": "身体对抗能躲就躲，卡位时像在给别人让停车位。",
+    "M": "不排斥对抗，但硬仗多了还是会本能保守。",
+    "H": "愿意顶、敢碰、能扛，不会一有接触就先交出空间。"
+  },
+  "S12": {
+    "L": "对自己身体条件认知模糊，常把短板当个性，把错位当梦想。",
+    "M": "大致有数，但偶尔还是会被自尊带去错误片场。",
+    "H": "知道自己能吃哪碗饭，不会拿身体条件和现实硬碰硬。"
+  },
+  "S13": {
+    "L": "一换位置就容易变成新生儿，适应效率相当感人。",
+    "M": "基础位置能切，但跨度一大还是会露馅。",
+    "H": "位置适应力不错，补洞时不至于把场面补得更烂。"
+  },
+  "S14": {
+    "L": "战术理解偏慢，会议听过了但球一开还是像第一次见。",
+    "M": "能理解大方向，复杂一点就开始靠经验瞎猜。",
+    "H": "读战术、读轮次、读针对都比较快，脑子确实有在跟上。"
+  },
+  "S15": {
+    "L": "实战储备有限，陌生局面容易把你直接送回新手教程。",
+    "M": "打过一些球，遇到复杂场面还得边打边学。",
+    "H": "比赛经验比较够用，知道哪些球该忍，哪些球该狠狠干。"
+  }
+};
+    const dimensionOrder = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14","S15"];
+
+    const app = {
+      shuffledQuestions: [],
+      answers: {},
+      previewMode: false
+    };
+
+    const screens = {
+      intro: document.getElementById('intro'),
+      test: document.getElementById('test'),
+      result: document.getElementById('result')
+    };
+
+    const questionList = document.getElementById('questionList');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const submitBtn = document.getElementById('submitBtn');
+    const testHint = document.getElementById('testHint');
+
+    function showScreen(name) {
+      Object.entries(screens).forEach(([key, el]) => {
+        el.classList.toggle('active', key === name);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function getVisibleQuestions() {
+      return [...app.shuffledQuestions];
+    }
+
+    function getQuestionMetaLabel(q) {
+      if (q.special) return '补充题';
+      return app.previewMode ? dimensionMeta[q.dim].name : '维度已隐藏';
+    }
+
+    function renderQuestions() {
+      const visibleQuestions = getVisibleQuestions();
+      questionList.innerHTML = '';
+      visibleQuestions.forEach((q, index) => {
+        const card = document.createElement('article');
+        card.className = 'question';
+        card.innerHTML = `
+          <div class="question-meta">
+            <div class="badge">第 ${index + 1} 题</div>
+            <div>${getQuestionMetaLabel(q)}</div>
+          </div>
+          <div class="question-title">${q.text}</div>
+          <div class="options">
+            ${q.options.map((opt, i) => {
+              const code = ['A', 'B', 'C', 'D'][i] || String(i + 1);
+              const checked = app.answers[q.id] === opt.value ? 'checked' : '';
+              return `
+                <label class="option">
+                  <input type="radio" name="${q.id}" value="${opt.value}" ${checked} />
+                  <div class="option-code">${code}</div>
+                  <div>${opt.label}</div>
+                </label>
+              `;
+            }).join('')}
+          </div>
+        `;
+        questionList.appendChild(card);
+      });
+
+      questionList.querySelectorAll('input[type="radio"]').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const { name, value } = e.target;
+          app.answers[name] = Number(value);
+          updateProgress();
+        });
+      });
+
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const visibleQuestions = getVisibleQuestions();
+      const total = visibleQuestions.length;
+      const done = visibleQuestions.filter(q => app.answers[q.id] !== undefined).length;
+      const percent = total ? (done / total) * 100 : 0;
+      progressBar.style.width = `${percent}%`;
+      progressText.textContent = `${done} / ${total}`;
+      const complete = done === total && total > 0;
+      submitBtn.disabled = !complete;
+      testHint.textContent = complete
+        ? '都做完了。现在可以把你的电子魂魄交给结果页审判。'
+        : '全选完才会放行。世界已经够乱了，起码把题做完整。';
+    }
+
+    function sumToLevel(score, count) {
+      if (!count) return 'M';
+      const avg = score / count;
+      if (avg < 1.67) return 'L';
+      if (avg < 2.34) return 'M';
+      return 'H';
+    }
+
+    function levelNum(level) {
+      return { L: 1, M: 2, H: 3 }[level];
+    }
+
+    function parsePattern(pattern) {
+      return pattern.replace(/-/g, '').split('');
+    }
+
+    function computeResult() {
+      const rawScores = {};
+      const questionCounts = {};
+      const avgScores = {};
+      const levels = {};
+      Object.keys(dimensionMeta).forEach(dim => {
+        rawScores[dim] = 0;
+        questionCounts[dim] = 0;
+        avgScores[dim] = 0;
+      });
+
+      questions.forEach(q => {
+        rawScores[q.dim] += Number(app.answers[q.id] || 0);
+        questionCounts[q.dim] += 1;
+      });
+
+      Object.entries(rawScores).forEach(([dim, score]) => {
+        avgScores[dim] = questionCounts[dim] ? score / questionCounts[dim] : 0;
+        levels[dim] = sumToLevel(score, questionCounts[dim]);
+      });
+
+      const userVector = dimensionOrder.map(dim => levelNum(levels[dim]));
+      const ranked = NORMAL_TYPES.map(type => {
+        const vector = parsePattern(type.pattern).map(levelNum);
+        let distance = 0;
+        let exact = 0;
+        for (let i = 0; i < vector.length; i++) {
+          const diff = Math.abs(userVector[i] - vector[i]);
+          distance += diff;
+          if (diff === 0) exact += 1;
+        }
+        const similarity = Math.max(0, Math.round((1 - distance / 30) * 100));
+        return { ...type, ...TYPE_LIBRARY[type.code], distance, exact, similarity };
+      }).sort((a, b) => {
+        if (a.distance !== b.distance) return a.distance - b.distance;
+        if (b.exact !== a.exact) return b.exact - a.exact;
+        return b.similarity - a.similarity;
+      });
+
+      const bestNormal = ranked[0];
+      const finalType = bestNormal;
+      let modeKicker = '你的主类型';
+      let badge = `匹配度 ${bestNormal.similarity}% · 精准命中 ${bestNormal.exact}/15 维`;
+      let sub = '系统按十五维给出的第一画像。匹配度高不代表你强，只代表你的毛病比较稳定。';
+      let special = false;
+      let secondaryType = null;
+
+      return {
+        rawScores,
+        questionCounts,
+        avgScores,
+        levels,
+        ranked,
+        bestNormal,
+        finalType,
+        modeKicker,
+        badge,
+        sub,
+        special,
+        secondaryType
+      };
+    }
+
+    function renderDimList(result) {
+      const dimList = document.getElementById('dimList');
+      dimList.innerHTML = dimensionOrder.map(dim => {
+        const level = result.levels[dim];
+        const explanation = DIM_EXPLANATIONS[dim][level];
+        return `
+          <div class="dim-item">
+            <div class="dim-item-top">
+              <div class="dim-item-name">${dimensionMeta[dim].name}</div>
+              <div class="dim-item-score">${level} / 均分 ${result.avgScores[dim].toFixed(2)}（${result.questionCounts[dim]}题）</div>
+            </div>
+            <p>${explanation}</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderResult() {
+      const result = computeResult();
+      const type = result.finalType;
+
+      document.getElementById('resultModeKicker').textContent = result.modeKicker;
+      document.getElementById('resultTypeName').textContent = `${type.code}（${type.cn}）`;
+      document.getElementById('matchBadge').textContent = result.badge;
+      document.getElementById('resultTypeSub').textContent = result.sub;
+      document.getElementById('resultDesc').textContent = type.desc;
+      document.getElementById('posterCaption').textContent = type.intro;
+      document.getElementById('funNote').textContent = '本测试仅供娱乐，别拿它当选拔、淘汰、封神、退役建议或人生判决书。你可以笑，但别太当真。';
+
+      const posterBox = document.getElementById('posterBox');
+      const posterImage = document.getElementById('posterImage');
+      const imageSrc = TYPE_IMAGES[type.code];
+      if (imageSrc) {
+        posterImage.src = imageSrc;
+        posterImage.alt = `${type.code}（${type.cn}）`;
+        posterBox.classList.remove('no-image');
+      } else {
+        posterImage.removeAttribute('src');
+        posterImage.alt = '';
+        posterBox.classList.add('no-image');
+      }
+
+      renderDimList(result);
+      showScreen('result');
+    }
+
+    function startTest(preview = false) {
+      app.previewMode = preview;
+      app.answers = {};
+      const romanceQuestion = questions.find((q) => q.id === 'q24');
+      const regularQuestions = questions.filter((q) => q.id !== 'q24');
+      app.shuffledQuestions = romanceQuestion
+        ? [...shuffle(regularQuestions), romanceQuestion]
+        : shuffle(questions);
+      renderQuestions();
+      showScreen('test');
+    }
+
+    document.getElementById('startBtn').addEventListener('click', () => startTest(false));
+    document.getElementById('backIntroBtn').addEventListener('click', () => showScreen('intro'));
+    document.getElementById('submitBtn').addEventListener('click', renderResult);
+    document.getElementById('restartBtn').addEventListener('click', () => startTest(false));
+    document.getElementById('toTopBtn').addEventListener('click', () => showScreen('intro'));
+  </script>
+
+</body>
+</html>
